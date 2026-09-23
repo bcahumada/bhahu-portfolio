@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem("bh2-theme");document.documentElement.setAttribute("data-theme",(t==="light"||t==="dark")?t:"dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Asistente RAG sobre documentación técnica · Bárbara Hurtado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap">
+<style>
+:root{
+  --ink:#14181d; --body:#3f474f; --soft:#6b7480;
+  --ground:#f6f6f3; --surface:#ffffff; --surface2:#f4f4f0;
+  --border:#e4e4de; --chip:#ecece8;
+  --accent:#33404e; --accent-strong:#232c37; --accent-soft:#ececf0;
+  --amber:#9a6a2e;
+  --shadow:0 1px 2px rgba(20,24,29,.04), 0 8px 26px rgba(20,24,29,.06);
+  --maxw:1120px;
+  --display:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ink:#f2f3f4; --body:#c5cad0; --soft:#7f8892;
+  --ground:#080a0d; --surface:#11151a; --surface2:#161b21;
+  --border:#2a3139; --chip:#1b222b;
+  --accent:#d7e0e9; --accent-strong:#eef2f6; --accent-soft:#1a222c;
+  --amber:#d0a24a;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.28);
+}}
+:root[data-theme="dark"]{
+  --ink:#f2f3f4; --body:#c5cad0; --soft:#7f8892;
+  --ground:#080a0d; --surface:#11151a; --surface2:#161b21;
+  --border:#2a3139; --chip:#1b222b;
+  --accent:#d7e0e9; --accent-strong:#eef2f6; --accent-soft:#1a222c;
+  --amber:#d0a24a;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--ground); color:var(--body);
+  font-family:var(--sans); font-size:16px; line-height:1.6;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+img{max-width:100%}
+a{color:var(--accent-strong); text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+h1,h2,h3{color:var(--ink); text-wrap:balance; margin:0}
+.wrap{max-width:var(--maxw); margin:0 auto; padding-inline:22px}
+.eyebrow{font-family:var(--mono); font-size:12.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-strong)}
+.mono{font-family:var(--mono)}
+
+/* ---------- nav ---------- */
+.nav{position:sticky; top:env(safe-area-inset-top,0px); z-index:20;
+  background:color-mix(in srgb, var(--ground) 86%, transparent);
+  backdrop-filter:saturate(1.4) blur(8px);
+  border-bottom:1px solid var(--border)}
+.nav-in{max-width:var(--maxw); margin:0 auto; padding:12px 22px; display:flex; align-items:center; gap:18px}
+.brand{display:flex; align-items:center; gap:10px; font-weight:600; color:var(--ink); font-size:15px}
+.mono-badge{font-family:var(--mono); font-size:12px; width:30px; height:30px; display:grid; place-items:center;
+  background:var(--accent); color:#fff; border-radius:8px; letter-spacing:.02em}
+.nav-links{margin-left:auto; display:flex; gap:20px; align-items:center}
+.nav-links a{color:var(--soft); font-size:14px; font-weight:500}
+.nav-links a:hover{color:var(--ink); text-decoration:none}
+.tgl{border:1px solid var(--border); background:var(--surface); color:var(--body);
+  width:34px; height:34px; border-radius:9px; cursor:pointer; display:grid; place-items:center; font-size:15px}
+.tgl:hover{color:var(--ink); border-color:var(--accent)}
+@media(max-width:720px){.nav-links a:not(.cta-mini){display:none}}
+
+/* ---------- hero ---------- */
+.hero{padding-block:64px 40px}
+.hero-grid{display:grid; grid-template-columns:1.35fr .9fr; gap:44px; align-items:center}
+.hero h1{font-family:var(--display); font-weight:500; font-size:clamp(38px,6vw,66px); line-height:1.02; letter-spacing:-.01em; margin:14px 0 0}
+.hero .role{font-size:clamp(17px,2.2vw,21px); color:var(--ink); font-weight:600; margin-top:16px}
+.hero .role span{color:var(--accent-strong)}
+.hero p.lead{margin:16px 0 0; max-width:56ch; font-size:16.5px}
+.cta-row{display:flex; flex-wrap:wrap; gap:12px; margin-top:26px}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:11px 18px; border-radius:11px; font-weight:600; font-size:14.5px; border:1px solid var(--border); background:var(--surface); color:var(--ink)}
+.btn:hover{text-decoration:none; border-color:var(--accent)}
+.btn.primary{background:var(--accent); color:#fff; border-color:var(--accent)}
+.btn.primary:hover{background:var(--accent-strong); border-color:var(--accent-strong)}
+.facts{display:flex; flex-wrap:wrap; gap:10px 26px; margin-top:30px}
+.fact b{color:var(--ink); font-weight:700}
+.fact{font-size:13.5px; color:var(--soft)}
+.idcard{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:24px; box-shadow:var(--shadow)}
+.idcard .mono-badge{width:46px; height:46px; font-size:17px; border-radius:12px}
+.idcard .name{color:var(--ink); font-weight:700; margin-top:14px}
+.idcard .loc{font-size:13.5px; color:var(--soft); font-family:var(--mono)}
+.idcard hr{border:0; border-top:1px solid var(--border); margin:16px 0}
+.stack-label{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); margin-bottom:9px}
+.chips{display:flex; flex-wrap:wrap; gap:7px}
+.chip{font-family:var(--mono); font-size:12px; padding:5px 9px; border-radius:7px; background:var(--chip); color:var(--body); border:1px solid transparent}
+.chip.k{background:var(--accent-soft); color:var(--accent-strong)}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr; gap:30px} .hero{padding-block:44px 26px}}
+
+/* ---------- section frame ---------- */
+section{padding-block:52px; border-top:1px solid var(--border)}
+.sec-head{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:26px}
+.sec-head h2{font-family:var(--display); font-weight:500; font-size:clamp(26px,3.4vw,36px); letter-spacing:-.01em}
+.sec-head .num{font-family:var(--mono); color:var(--accent-strong); font-size:14px}
+.sec-intro{max-width:64ch; margin:-10px 0 26px; color:var(--body)}
+
+/* ---------- about ---------- */
+.about{display:grid; grid-template-columns:1.4fr .85fr; gap:38px}
+.about p{margin:0 0 14px; max-width:62ch}
+.about p b{color:var(--ink)}
+.side{display:flex; flex-direction:column; gap:18px}
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 20px}
+.panel h3{font-size:13px; font-family:var(--mono); letter-spacing:.12em; text-transform:uppercase; color:var(--soft); margin-bottom:12px}
+.panel ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:11px}
+.panel li{font-size:14px; line-height:1.4}
+.panel li b{color:var(--ink); display:block; font-weight:600}
+.panel li span{color:var(--soft); font-size:12.5px}
+@media(max-width:860px){.about{grid-template-columns:1fr; gap:26px}}
+
+/* ---------- sobre mí (convergencia) ---------- */
+.ab-statement{max-width:960px; margin:2px 0 26px; font-family:var(--display); font-weight:500;
+  font-size:clamp(24px,3.6vw,42px); line-height:1.16; letter-spacing:-.02em; color:var(--ink)}
+.ab-statement b{color:var(--accent-strong); font-weight:600}
+.ab-intro{max-width:72ch; color:var(--body); font-size:16px; margin:0 0 46px}
+.ab-intro b{color:var(--ink); font-weight:600}
+
+.ab-domains{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border);
+  border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:60px}
+.ab-domain{background:var(--surface); padding:24px 22px; display:flex; flex-direction:column; gap:9px; min-height:184px; transition:background .25s ease}
+.ab-domain:hover{background:var(--surface2)}
+.ab-domain .ix{font-family:var(--mono); font-size:11px; color:var(--soft); letter-spacing:.14em}
+.ab-domain h3{font-size:16px; font-weight:600; color:var(--ink)}
+.ab-domain p{font-size:13.5px; color:var(--soft); line-height:1.55; margin:0}
+.ab-domain .anchor{margin-top:auto; padding-top:14px; font-size:12.5px; color:var(--accent-strong); font-weight:500}
+
+.ab-flow{position:relative; display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin:0 0 62px}
+.ab-flow::before{content:""; position:absolute; top:34px; left:9%; right:9%; height:1px; background:var(--border); z-index:0}
+.ab-step{position:relative; z-index:1; text-align:center}
+.ab-node{width:68px; height:68px; margin:0 auto 16px; border:1px solid var(--border); background:var(--surface);
+  border-radius:50%; display:grid; place-items:center; font-family:var(--mono); font-size:10.5px; letter-spacing:.05em;
+  text-transform:uppercase; color:var(--soft); transition:transform .25s ease, border-color .25s ease, color .25s ease}
+.ab-step:hover .ab-node{transform:translateY(-4px); border-color:var(--accent); color:var(--accent-strong)}
+.ab-step h4{font-size:14.5px; font-weight:600; color:var(--ink); margin:0}
+.ab-step p{font-size:12.5px; color:var(--soft); margin:5px 0 0}
+
+.ab-connect{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-bottom:56px}
+.ab-cpt{border-top:1px solid var(--border); padding-top:16px}
+.ab-cpt b{display:block; font-size:14.5px; color:var(--ink); margin-bottom:6px; font-weight:600}
+.ab-cpt span{font-size:13px; color:var(--soft); line-height:1.55}
+
+.ab-close{border-top:1px solid var(--border); padding-top:34px; display:flex; gap:44px; justify-content:space-between; align-items:flex-end; flex-wrap:wrap}
+.ab-close h3{font-family:var(--display); font-weight:500; font-size:clamp(22px,3vw,32px); line-height:1.2; letter-spacing:-.02em; max-width:640px}
+.ab-close p{max-width:320px; color:var(--soft); font-size:13.5px; margin:0}
+
+@media(max-width:860px){
+  .ab-domains{grid-template-columns:repeat(2,1fr)}
+  .ab-connect{grid-template-columns:1fr; gap:14px}
+  .ab-flow{grid-template-columns:1fr; gap:18px}
+  .ab-flow::before{display:none}
+  .ab-step{display:grid; grid-template-columns:56px 1fr; gap:16px; text-align:left; align-items:center}
+  .ab-node{width:52px; height:52px; margin:0}
+  .ab-close{flex-direction:column; align-items:flex-start; gap:14px}
+}
+@media(max-width:520px){ .ab-domains{grid-template-columns:1fr} .ab-domain{min-height:auto} }
+
+/* ---------- tabs ---------- */
+.tabs{display:flex; gap:6px; flex-wrap:wrap; border-bottom:1px solid var(--border); margin-bottom:28px}
+.tab{appearance:none; border:1px solid transparent; border-bottom:none; background:transparent; cursor:pointer;
+  font-family:var(--sans); font-size:15px; font-weight:600; color:var(--soft); padding:12px 18px;
+  border-radius:12px 12px 0 0; position:relative; top:1px; display:flex; align-items:center; gap:9px}
+.tab:hover{color:var(--ink)}
+.tab .mn{font-family:var(--mono); font-size:11px; color:var(--soft); font-weight:500}
+.tab .star{color:var(--amber)}
+.tab[aria-selected="true"]{color:var(--ink); background:var(--surface); border-color:var(--border); border-bottom-color:var(--surface); box-shadow:0 -3px 10px rgba(22,35,58,.04)}
+.tab[aria-selected="true"] .mn{color:var(--accent-strong)}
+.tpanel{display:none}
+.tpanel.active{display:block}
+@media (prefers-reduced-motion:no-preference){.tpanel.active{animation:fade .28s ease}}
+@keyframes fade{from{opacity:0; transform:translateY(5px)} to{opacity:1; transform:none}}
+/* focus mode: when arriving from the main page to a single project, show only that report */
+body.focus #top,
+body.focus #sobre-mi,
+body.focus #proyectos .sec-head,
+body.focus #proyectos .sec-intro,
+body.focus #proyectos .tabs{display:none}
+body.focus #proyectos{padding-top:104px; border-top:0}
+
+/* ---------- project panel ---------- */
+.proj-head{display:flex; flex-wrap:wrap; gap:8px 16px; align-items:baseline; margin-bottom:4px}
+.proj-head h3{font-family:var(--display); font-weight:500; font-size:clamp(24px,3vw,32px)}
+.proj-meta{font-family:var(--mono); font-size:12.5px; color:var(--soft)}
+.lead2{font-size:16px; max-width:72ch; margin:12px 0 24px}
+.proj-body{display:grid; grid-template-columns:1.12fr .88fr; gap:30px; align-items:start}
+@media(max-width:860px){.proj-body{grid-template-columns:1fr; gap:24px}}
+.keypoints{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:14px}
+.keypoints li{position:relative; padding-left:22px; font-size:14.5px}
+.keypoints li::before{content:""; position:absolute; left:0; top:8px; width:9px; height:9px; border-radius:3px; background:var(--accent)}
+.keypoints li b{color:var(--ink); font-weight:600}
+.kp-title{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--soft); margin:0 0 14px}
+.tech-row{margin-top:22px}
+
+/* figures & gallery */
+figure.fig{margin:0; background:var(--surface2); border:1px solid var(--border); border-radius:14px; padding:18px}
+figure.fig svg{width:100%; height:auto; display:block}
+figure.fig img{width:100%; height:auto; display:block; border-radius:9px; border:1px solid var(--border)}
+figcaption{font-family:var(--mono); font-size:12px; color:var(--soft); margin-top:13px; line-height:1.45}
+figcaption b{color:var(--ink); font-weight:600}
+.gal{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:22px}
+.gal .wide{grid-column:1 / -1}
+@media(max-width:760px){.gal{grid-template-columns:1fr}}
+.note{background:var(--surface2); border:1px dashed var(--border); border-radius:12px; padding:14px 16px; font-size:13.5px; color:var(--soft); margin-top:22px; line-height:1.5}
+.note b{color:var(--ink)}
+
+/* case study bits (M9) */
+.metrics{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:26px 0}
+.metric{background:var(--surface2); border:1px solid var(--border); border-radius:13px; padding:16px}
+.metric .n{font-family:var(--display); font-weight:600; font-size:30px; color:var(--ink); line-height:1}
+.metric .l{font-size:12.5px; color:var(--soft); margin-top:7px; line-height:1.35}
+.qa{display:grid; grid-template-columns:1fr 1fr; gap:22px 34px; margin-top:8px}
+.qa .item h4{margin:0 0 6px; color:var(--accent-strong); font-size:13px; font-family:var(--mono); letter-spacing:.06em; text-transform:uppercase}
+.qa .item p{margin:0; font-size:14.5px}
+.qa .item.span2{grid-column:1 / -1}
+.hl{background:var(--accent-soft); border-left:3px solid var(--accent); padding:14px 16px; border-radius:0 10px 10px 0; margin-top:24px; color:var(--ink); font-size:14.5px}
+.subhead{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--soft); margin:34px 0 4px}
+@media(max-width:860px){.metrics{grid-template-columns:repeat(2,1fr)} .qa{grid-template-columns:1fr}}
+
+/* data tables */
+.dtable-wrap{overflow-x:auto; margin:6px 0 6px; border:1px solid var(--border); border-radius:12px}
+.dtable{width:100%; border-collapse:collapse; font-size:13.5px; min-width:540px}
+.dtable th,.dtable td{text-align:left; padding:10px 13px; border-bottom:1px solid var(--border); vertical-align:top; line-height:1.4}
+.dtable thead th{background:var(--surface2); color:var(--ink); font-family:var(--mono); font-size:11px; letter-spacing:.04em; text-transform:uppercase; font-weight:600}
+.dtable tbody tr:last-child td{border-bottom:0}
+.dtable td b{color:var(--ink); font-weight:600}
+.dtable .good{color:var(--accent-strong); font-weight:600; white-space:nowrap}
+.dtable .warn{color:var(--amber); font-weight:600; white-space:nowrap}
+.dtable .id{font-family:var(--mono); font-size:12px; color:var(--accent-strong); white-space:nowrap}
+.tcap{font-family:var(--mono); font-size:11.5px; color:var(--soft); margin:9px 0 22px; line-height:1.4}
+
+/* prose blocks, reflections */
+.block-h{font-family:var(--display); font-weight:500; font-size:21px; color:var(--ink); margin:36px 0 10px}
+.prose{font-size:14.5px; max-width:74ch; margin:0 0 14px; color:var(--body)}
+.prose b{color:var(--ink)}
+.reflect{margin:6px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:13px; max-width:78ch}
+.reflect li{position:relative; padding-left:22px; font-size:14.5px}
+.reflect li::before{content:"—"; position:absolute; left:0; color:var(--accent); font-weight:700}
+.reflect li b{color:var(--ink)}
+.ctxbox{background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin:2px 0 10px}
+.ctxbox p{margin:0; font-size:14px}
+
+/* review / grade callout */
+.review{display:flex; gap:20px; align-items:flex-start; background:var(--accent-soft); border:1px solid var(--border); border-left:3px solid var(--amber); border-radius:12px; padding:18px 20px; margin:24px 0}
+.review .grade{flex:none; text-align:center; min-width:74px}
+.review .grade .g{font-family:var(--display); font-weight:600; font-size:36px; color:var(--ink); line-height:1}
+.review .grade .gl{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-strong); margin-top:5px; line-height:1.3}
+.review blockquote{margin:0; font-size:14.5px; color:var(--ink); font-style:italic; line-height:1.55}
+.review .by{font-family:var(--mono); font-size:12px; color:var(--soft); margin-top:9px; font-style:normal}
+@media(max-width:560px){.review{flex-direction:column; gap:12px} .review .grade{display:flex; gap:12px; align-items:baseline; text-align:left}}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+.cc{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 20px}
+.cc .k{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--soft)}
+.cc a, .cc span{display:block; margin-top:6px; color:var(--ink); font-weight:600; font-size:14.5px; word-break:break-word}
+@media(max-width:860px){.contact-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.contact-grid{grid-template-columns:1fr}}
+
+footer{border-top:1px solid var(--border); padding-block:26px; color:var(--soft); font-size:13px; text-align:center}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+
+.report{{padding:118px 0 72px}}
+.rpt-eyebrow{{font-family:var(--mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--soft); margin-bottom:26px; display:flex; align-items:center; gap:12px}}
+.rpt-eyebrow::before{{content:""; width:26px; height:1px; background:var(--soft)}}
+footer a{{color:var(--soft)}}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="index.html"><span class="mono-badge">BH</span> Bárbara Hurtado</a>
+  <div class="nav-links">
+    <a href="index.html">← Inicio</a>
+    <a href="index.html#contacto" class="cta-mini">Contacto</a>
+    <button class="tgl" id="tgl" aria-label="Cambiar tema" title="Tema">◐</button>
+  </div>
+</div></nav>
+<main class="report"><div class="wrap">
+  <div class="rpt-eyebrow">Proyecto · Informe completo</div>
+  <div class="proj-head"><h3>Asistente RAG sobre documentación técnica</h3></div>
+  <div class="proj-meta">Proyecto de Data Science / Applied AI · Python · ChromaDB · FastAPI · Gemini · Datos sintéticos de operaciones de red</div>
+  <p class="lead2">Un asistente que responde preguntas sobre documentación técnica <b>citando la fuente</b>, y que reconoce cuándo la respuesta <b>no está</b> en los documentos: control de alucinaciones incorporado.</p>
+<figure class="fig"><svg viewBox="0 0 1254 118" style="width:100%;height:auto" role="img" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="26" width="168" height="66" rx="11" style="fill:var(--surface);stroke:var(--border);stroke-width:1"/><text x="92.0" y="54" text-anchor="middle" style="fill:var(--ink);font-family:var(--display);font-weight:600;font-size:14px">Documentos</text><text x="92.0" y="72" text-anchor="middle" style="fill:var(--soft);font-family:var(--mono);font-size:11px">.md</text><line x1="182" y1="59.0" x2="210" y2="59.0" style="stroke:var(--soft);stroke-width:1.4"/><path d="M208,55.0 L216,59.0 L208,63.0 Z" style="fill:var(--soft)"/><rect x="222" y="26" width="168" height="66" rx="11" style="fill:var(--surface);stroke:var(--border);stroke-width:1"/><text x="306.0" y="54" text-anchor="middle" style="fill:var(--ink);font-family:var(--display);font-weight:600;font-size:14px">Chunking</text><text x="306.0" y="72" text-anchor="middle" style="fill:var(--soft);font-family:var(--mono);font-size:11px">por secciones</text><line x1="396" y1="59.0" x2="424" y2="59.0" style="stroke:var(--soft);stroke-width:1.4"/><path d="M422,55.0 L430,59.0 L422,63.0 Z" style="fill:var(--soft)"/><rect x="436" y="26" width="168" height="66" rx="11" style="fill:var(--surface);stroke:var(--border);stroke-width:1"/><text x="520.0" y="54" text-anchor="middle" style="fill:var(--ink);font-family:var(--display);font-weight:600;font-size:14px">Base vectorial</text><text x="520.0" y="72" text-anchor="middle" style="fill:var(--soft);font-family:var(--mono);font-size:11px">ChromaDB</text><line x1="610" y1="59.0" x2="638" y2="59.0" style="stroke:var(--soft);stroke-width:1.4"/><path d="M636,55.0 L644,59.0 L636,63.0 Z" style="fill:var(--soft)"/><rect x="650" y="26" width="168" height="66" rx="11" style="fill:var(--surface);stroke:var(--border);stroke-width:1"/><text x="734.0" y="54" text-anchor="middle" style="fill:var(--ink);font-family:var(--display);font-weight:600;font-size:14px">Retrieval</text><text x="734.0" y="72" text-anchor="middle" style="fill:var(--soft);font-family:var(--mono);font-size:11px">top-k</text><line x1="824" y1="59.0" x2="852" y2="59.0" style="stroke:var(--soft);stroke-width:1.4"/><path d="M850,55.0 L858,59.0 L850,63.0 Z" style="fill:var(--soft)"/><rect x="864" y="26" width="168" height="66" rx="11" style="fill:var(--surface);stroke:var(--border);stroke-width:1"/><text x="948.0" y="54" text-anchor="middle" style="fill:var(--ink);font-family:var(--display);font-weight:600;font-size:14px">LLM</text><text x="948.0" y="72" text-anchor="middle" style="fill:var(--soft);font-family:var(--mono);font-size:11px">Gemini</text><line x1="1038" y1="59.0" x2="1066" y2="59.0" style="stroke:var(--soft);stroke-width:1.4"/><path d="M1064,55.0 L1072,59.0 L1064,63.0 Z" style="fill:var(--soft)"/><rect x="1078" y="26" width="168" height="66" rx="11" style="fill:var(--surface);stroke:var(--border);stroke-width:1"/><text x="1162.0" y="54" text-anchor="middle" style="fill:var(--ink);font-family:var(--display);font-weight:600;font-size:14px">Respuesta</text><text x="1162.0" y="72" text-anchor="middle" style="fill:var(--soft);font-family:var(--mono);font-size:11px">+ cita</text></svg><figcaption>Del documento a una respuesta citada: ingesta, recuperación y generación controlada.</figcaption></figure>
+<div class="metrics"><div class="metric"><div class="n">19 / 4</div><div class="l">chunks / documentos</div></div><div class="metric"><div class="n">all-MiniLM</div><div class="l">modelo de embeddings</div></div><div class="metric"><div class="n">FastAPI</div><div class="l">endpoint /ask</div></div><div class="metric"><div class="n">solo-retrieval</div><div class="l">modo de depuración</div></div></div>
+<h2 style="margin:34px 0 10px">Qué resuelve</h2>
+<p style="max-width:74ch;margin:12px 0;color:var(--body)">Los equipos técnicos pierden tiempo buscando en manuales largos. Un RAG (<i>Retrieval-Augmented Generation</i>) permite preguntar en lenguaje natural y obtener una respuesta corta, con la cita del documento de origen, sin inventar lo que no está.</p>
+<h2 style="margin:34px 0 10px">Cómo funciona</h2>
+<ul style="max-width:74ch;margin:12px 0;padding-left:20px;color:var(--body);line-height:1.6"><li style="margin:7px 0">La <b>ingesta</b> trocea cada documento por sus títulos de sección (<span style="font-family:var(--mono)">##</span>) —chunking estructural—, genera embeddings con un modelo local (all-MiniLM-L6-v2) y los indexa en una base vectorial (ChromaDB).</li><li style="margin:7px 0">La <b>API</b> expone <span style="font-family:var(--mono)">POST /ask</span> con FastAPI (documentación Swagger en <span style="font-family:var(--mono)">/docs</span>). Recupera los chunks relevantes, arma el contexto y genera la respuesta.</li><li style="margin:7px 0">El prompt <b>obliga a citar la fuente</b> y a responder «No encontré esa información en la documentación disponible» cuando el contexto no alcanza.</li><li style="margin:7px 0">Sin API key, el endpoint entra en <b>modo solo-retrieval</b>: muestra los chunks recuperados sin LLM, útil para depurar el buscador.</li></ul>
+<h2 style="margin:34px 0 10px">Qué aprendí</h2>
+<p style="max-width:74ch;margin:12px 0;color:var(--body)">Comprobé que <b>sin buen retrieval no hay buena respuesta</b>, y que el prompt debe forzar el «no lo sé». La depuración de un RAG empieza mirando <i>qué</i> chunks recupera el buscador, no el modelo.</p>
+<h2 style="margin:34px 0 10px">Evidencia (ejecución del código)</h2>
+<p style="max-width:74ch;margin:12px 0;color:var(--body)">Extracto real del código: el prompt fuerza la citación y el "no lo sé", y la API expone su documentación Swagger. (La demo en vivo se reproduce en 2 minutos con el kit.)</p>
+<figure class="fig"><pre style="font-family:var(--mono);font-size:12.5px;line-height:1.55;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;color:var(--body);white-space:pre-wrap;overflow-x:auto;margin:8px 0">Prompt del asistente (reglas anti-alucinacion, extracto real):
+  - Responde SOLO con el CONTEXTO recuperado.
+  - Si no esta: &quot;No encontre esa informacion en la documentacion disponible.&quot;
+  - Cita siempre la fuente:  [fuente: archivo / seccion].
+
+Documentos indexados (docs_red/):
+  procedimiento_reinicio_nodo.md · alarmas_frecuentes.md
+  parametros_5g.md · politica_cambios.md      -&gt;  19 chunks
+
+Endpoints FastAPI:  POST /ask  ·  GET /health  ·  Swagger UI en /docs</pre><figcaption>Diseño del asistente · reglas de citación y control de alucinaciones, endpoints de la API.</figcaption></figure>
+<h2 style="margin:34px 0 10px">Stack</h2>
+<div class="chips"><span class="chip">Python</span><span class="chip">ChromaDB</span><span class="chip">all-MiniLM-L6-v2</span><span class="chip">FastAPI</span><span class="chip">Gemini</span><span class="chip">python-dotenv</span></div>
+<p class="note"><b>Proyecto personal de práctica</b> con documentación sintética de operaciones de red. No es trabajo en producción; el objetivo fue dominar el patrón RAG de punta a punta.</p>
+</div></main>
+<footer><div class="wrap">© 2026 Bárbara Hurtado Ahumada · <a href="index.html">Volver al portafolio</a></div></footer>
+<script>
+(function(){var r=document.documentElement,b=document.getElementById('tgl'),s=null;try{s=localStorage.getItem('bh2-theme');}catch(e){}
+r.setAttribute('data-theme',(s==='dark'||s==='light')?s:'dark');
+function c(){return r.getAttribute('data-theme')||((window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');}
+b.addEventListener('click',function(){var n=c()==='dark'?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('bh2-theme',n);}catch(e){}});})();
+</script>
+</body></html>
